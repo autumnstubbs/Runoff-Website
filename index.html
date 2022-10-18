@@ -1,0 +1,273 @@
+#file with the majority of the layout components
+
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <title>EOF-Runoff Homepage</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="bootstrap" href="bootstrap.css">
+  <!--
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+  -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" 
+    integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==" 
+    crossorigin="" />
+  
+  
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/footers/">
+  <link href="/docs/5.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+
+<body>
+  <header class="site-header fixed-top py-1">
+    <nav class="container d-flex flex-column flex-md-row justify-content-between">
+      <a class="py-2 d-none d-md-inline-block" href="#">Home</a>
+      <a class="py-2 d-none d-md-inline-block" href="#Forecast">Forecast</a>
+      <a class="py-2 d-none d-md-inline-block" href="#Background">Background</a>
+      <a class="py-2 d-none d-md-inline-block" href="#About">About us</a>
+    </nav>
+  </header>
+  
+  <div class="position-relative overflow-hidden text-center bg-light">
+    <div class="bg-image"></div>
+    <div class="bg-text">
+      <h1>Great Lakes Runoff Forecasting</h1>
+    </div>
+  </div>
+
+  <!---The onClick handling for each of the 10 day tabs--->
+
+  <section id = Forecast>
+  <nav>
+    <ul class = "searchbar">
+      <div class="search-container">
+        <form action="search">
+          <input type="text" placeholder="Enter Street Address" name="Street">
+          <button type="submit" onclick="searchDatabase()">Submit</button>
+      </form>
+    </ul>
+  </nav>
+
+
+  <div class="d-md-flex flex-md-equal w-100 my-md-0 ps-md-3">
+    <div class="bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-0 text-center text-white">
+      <div class="my-3 py-3">
+        <div id="mapid"></div>
+        <!-- <embed width='800px' height="600px"name="plugin" id="plugin"  type="application/pdf" internalinstanceid="37" title=""> -->
+      </div>
+    </div>
+    <div class="bg-light me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+      <div class="my-3 p-3">
+        
+        <!--- STATISTICS BOX CODE --->
+        
+        <h2 class="display-5">Forecast Details</h2>
+        
+      </div>
+      <div id="statsTableHolder" class="bg-dark shadow-sm mx-auto" style="width: 80%; min-width: 500px; height: 300px; border-radius: 21px 21px 21px 21px;">
+      <table id="popupStatsTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th title="Estimated runoff risk, combination of likelihood and severity of a runoff event">Risk</th>
+              <th title="Accumulated precipitation (mm over 1000m square region)">Rainfall</th>
+              <th title="Accumulated meltwater (mm over 1000m square region)">Snow Melt</th>
+              <th title="Accumulated snowfall (mm over 1000m square region)">Snowfall</th>
+            </tr>
+          </thead>
+          <tbody id="statsTableBody"></tbody>
+        </table>
+      </div>
+        <!--
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+        <script type="text/javascript" src="jquery.csvToTable.js"></script>
+
+        <script>
+          CsvToHtmlTable.init({
+            csv_path: 'sample data.csv', 
+            element: 'table-container', 
+            allow_download: true,
+            csv_options: {separator: ',', delimiter: '"'},
+            datatables_options: {"paging": false}
+          });
+        </script>
+
+        -->
+        <div id="csv_data">
+          <br>
+
+           <!--- SLIDE BAR CALL CODE--->
+  <div class="slidecontainer">
+    <input class="slider" id="valR" type="range" min="1" max="10" value="1" step="1" oninput="showVal(this.value)" onchange="showVal(this.value)" />
+    <!-- <p>Day:<span id="range"></span></p> -->
+    <p><span id="show_time"></span></p>
+    <script>
+      var show_time = document.getElementById("show_time");
+      var current_date = new Date();
+      var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      var day = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      var pretty_time = `${day[current_date.getDay()]}, ${months[current_date.getMonth()]} ${current_date.getDate()}, ${current_date.getFullYear()}`
+      show_time.innerHTML = pretty_time;
+    </script>
+    <img id="img">
+  </div>
+  <br>
+  <div>
+    <p><strong>What Does Risk Level Indicate?</strong></p>
+    <p>Risk is estimated based on the occurance probability and severity of the daily runoff event.</p>
+    <p style="font-size:15";>GREEN: NONE <strong>|</strong> YELLOW: MINIMAL <strong>|</strong> ORANGE: MODERATE <strong>|</strong> RED: HIGH</p>
+    <p><strong>Note: Precipitation Measured in Milimeters</strong></p>
+  </div>
+    
+          </div> 
+    </div>
+  </div>
+  
+    
+   
+</section>
+
+
+
+<!--- The "Background" section of the page --->
+<section id = Background>
+  <div class="d-md-flex flex-md-equal w-100 my-md-2 ps-md-3">
+    <div class="pt-md-2 px-md-5 text-center overflow-hidden">
+      <div class="my-3 p-3">
+        <h1 class="display-5">Background</h1>
+        <br>
+        <div class="slideshow-container">
+    
+          <div class="mySlides fade">
+            <div class="numbertext">1 / 5</div>
+            <img src="https://github.com/CISC475-498-EOF-Runoff-Project/CISC475-498-EOF-Runoff-Project.github.io/blob/main/images/BackgroundImage1.png?raw=true" style="width:100%">
+          </div>
+          
+          <div class="mySlides fade">
+            <div class="numbertext">2 / 5</div>
+            <img src="https://github.com/CISC475-498-EOF-Runoff-Project/CISC475-498-EOF-Runoff-Project.github.io/blob/main/images/BackgroundImage2.png?raw=true" style="width:100%">
+          </div>
+          
+          <div class="mySlides fade">
+            <div class="numbertext">3 / 5</div>
+            <img src="https://github.com/CISC475-498-EOF-Runoff-Project/CISC475-498-EOF-Runoff-Project.github.io/blob/main/images/BackgroundImage3.png?raw=true" style="width:100%">
+          </div>
+
+          <div class="mySlides fade">
+            <div class="numbertext">4 / 5</div>
+            <img src="https://github.com/CISC475-498-EOF-Runoff-Project/CISC475-498-EOF-Runoff-Project.github.io/blob/main/images/BackgroundImage4.png?raw=true" style="width:100%">
+          </div>
+          
+          <div class="mySlides fade">
+            <div class="numbertext">5 / 5</div>
+            <img src="https://github.com/CISC475-498-EOF-Runoff-Project/CISC475-498-EOF-Runoff-Project.github.io/blob/main/images/BackgroundImage5.png?raw=true" style="width:100%">
+          </div>
+          <br>
+          <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+          <a class="next" onclick="plusSlides(1)">&#10095;</a>
+          
+          </div>
+          <br>
+          <!------
+          <div style="text-align:center">
+            <span class="dot" onclick="currentSlide(1)"></span> 
+            <span class="dot" onclick="currentSlide(2)"></span> 
+            <span class="dot" onclick="currentSlide(3)"></span> 
+            <span class="dot" onclick="currentSlide(4)"></span> 
+          </div>
+          ----------------->
+        
+      </div>
+    </div>
+  </div>
+ </section>
+  
+
+<!--- The "About" section of the page --->
+<section id = About>
+  <div class="text-center bg-light">
+    <div class="pt-md-4 px-md-5 text-center overflow-hidden">
+    <h1 class="display-5">About Us</h1>
+        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+          <!--- About us Icon Dr. Hu-->
+         
+           
+            <div class="feature col">
+            <div class="feature-icon bg-primary bg-gradient">
+              <img src="https://github.com/CISC475-498-EOF-Runoff-Project/CISC475-498-EOF-Runoff-Project.github.io/blob/main/images/ProfilePicture2.png?raw=true" style="width:100%">
+            <!---Bios---->
+            </div>
+              <h2>Chirantan Ghosh</h2>
+            <p>Chirantan Ghosh is a Researcher in Computer Science at the University of Delaware. His research interests include Computer Vision, Artificial Intelligence, Robotics, NLP, Machine Learning, Deep Learning, Bio Informatics, Computer Graphics.</p>
+            <a href="https://www.eecis.udel.edu/~ghosh/" class="icon-link">
+              Visit Chirantan's Bio
+              <svg class="bi" width="1em" height="1em"><use xlink:href="#chevron-right"/></svg>
+            </a>
+          </div> 
+            
+          
+             <div class="feature col">
+            <div class="feature-icon bg-primary bg-gradient">
+              <img src="https://github.com/CISC475-498-EOF-Runoff-Project/CISC475-498-EOF-Runoff-Project.github.io/blob/main/images/ProfilePicture1.png?raw=true" style="width:100%">
+            </div>
+            <h2>Dr. Yao Hu</h2>
+            <p>Dr. Hu is an assistant professor in the Department of Geography and Spatial Sciences and Department of Civil and Environmental Engineering at the University of Delaware.</p>
+            <a href="#" class="icon-link">
+              <p><a href="https://www.udel.edu/academics/colleges/ceoe/departments/gss/faculty/yao-hu/">Visit Dr. Yao Hu's Bio</p>
+            </a>
+          </div>
+          
+          <div class="feature col">
+            <div class="feature-icon bg-primary bg-gradient">
+              <img src="https://github.com/CISC475-498-EOF-Runoff-Project/CISC475-498-EOF-Runoff-Project.github.io/blob/main/images/ProfilePicture3.png?raw=true" style="width:100%">
+            </div>
+            <h2>CISC475/498 Students</h2>
+            <p>Ryan Dean, Kasey Feldtmose, Brenna O'Connor, Erin Wallace, Matt Ward, Ruiheng Xie are all undergraduate Computer Science and Information Systems students at the University of Delaware who designed this web interface for CISC475/498 taught by Greg Silber.</p>
+            <a href="https://catalog.udel.edu/preview_course.php?catoid=47&coid=272458&print" class="icon-link">
+              CISC475 Info
+              <svg class="bi" width="1em" height="1em"><use xlink:href="#chevron-right"/></svg>
+            <a href="https://catalog.udel.edu/preview_course.php?catoid=47&coid=274856&print" class="icon-link">
+              CISC498 Info
+              <svg class="bi" width="1em" height="1em"><use xlink:href="#chevron-right"/></svg>
+          </div>
+              
+        </div>
+    </div>
+  </div>
+</section>
+
+  <div class="container">
+    <footer class="py-3 my-4">
+      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+        <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Home</a></li>
+        <li class="nav-item"><a href="#Forecast" class="nav-link px-2 text-muted">Forecast</a></li>
+        <li class="nav-item"><a href="#Background" class="nav-link px-2 text-muted">Background</a></li>
+        <li class="nav-item"><a href="#About" class="nav-link px-2 text-muted">About us</a></li>
+      </ul>
+      <p class="text-center text-muted">&copy; CISC475-498-Team-14</p>
+    </footer>
+  </div>
+</body>
+
+
+<script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js" 
+  integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==" 
+  crossorigin=""></script>
+<!--
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+-->
+  <script src="Javascript/Background.js"></script>
+  <script src="Javascript/slidebar.js"></script>   
+  <script src="Javascript/map.js"></script>   
+  <script src="Javascript/searchbar.js"></script>
+</html>
+ 

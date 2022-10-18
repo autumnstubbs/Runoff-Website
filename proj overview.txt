@@ -1,0 +1,13 @@
+PROJECT OVERVIEW
+Edge of Field Runoff predictor model for Great Lakes region.
+Silber has a hard drive with some data and the code from the client.
+The version of the code in Project II is cleaned up, has all packages, and can run the entire thing from a single button press.
+
+
+sample product we used for inspiration: 
+
+Goals for next phase of the project: 
+-create database (mongoDB or PostgreSQL) --> see sample ERD in images folder
+-run with larger datasets
+-connect database to website interface
+-pipe data from NOAA to database daily
