@@ -7,13 +7,14 @@ const port = 5000;
 app.listen(port, () => console.info(`Listening on port ${port}`));
 
 // Static Files
-app.use('/html', express.static(__dirname + 'index.js'));
-app.use('/css', express.static(__dirname + 'bootstrap.css'));
-app.use('/js', express.static(__dirname + 'Javascript/js'));
-// js, img
+app.use(express.static('public'));
+app.use('/css', express.static(__dirname + 'public/css'));
+app.use('/js', express.static(__dirname + 'public/js'));
+app.use('/img', express.static(__dirname + 'public/img'));
+
 
 app.get('', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/views/index.html')
 })
 
 /*
